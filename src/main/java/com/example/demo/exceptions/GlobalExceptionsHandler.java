@@ -12,6 +12,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 @ControllerAdvice
 public class GlobalExceptionsHandler {
@@ -30,16 +31,25 @@ public class GlobalExceptionsHandler {
 				         
 				     errors.put(fieldName, errorMessage);
 				     });
+				     
+				     ResponseWrapper response = new ResponseWrapper();
+				     response.setMsg_failure(errors.toString());
+				     
 				     System.out.println(" >>>>>>>>>>>>>>>>>> " +  errors);
-				     return new ResponseEntity(errors, HttpStatus.BAD_REQUEST);
+				     return new ResponseEntity(response, HttpStatus.BAD_REQUEST);
 	}
 	
 	 @ExceptionHandler(Exception.class)
-	    public final ResponseEntity<?> handleAllExceptions(Exception ex, WebRequest request) {
+	    public final ResponseEntity<?> handleAllExceptions(Exception ex, ServletWebRequest request) {
 		 Map<String,String> error = new HashMap<>();
-		 error.put("path",request.getContextPath());
-		 error.put("message","Please contact system administrator");
-	        return new ResponseEntity(error, HttpStatus.INTERNAL_SERVER_ERROR);
+		 
+		 String url = request.toString();
+		 
+		 error.put("path",url);
+		 error.put("message","Please contact system administrator: "+ex.getMessage());
+		 ResponseWrapper response = new ResponseWrapper();
+	     response.setMsg_failure(error.toString());
+	        return new ResponseEntity(response, HttpStatus.BAD_REQUEST);
 	    }
 
 }
