@@ -1,5 +1,9 @@
 package com.example.demo.controller;
 
+import java.io.Console;
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.validation.Valid;
 
 import org.apache.logging.log4j.LogManager;
@@ -17,6 +21,7 @@ import com.example.demo.bean.UserDao;
 import com.example.demo.exceptions.ResponseWrapper;
 
 @RestController
+@CrossOrigin
 @RequestMapping("/api")
 public class maincontroller {
 
@@ -35,6 +40,7 @@ public class maincontroller {
 	public ResponseWrapper RegisterUser(@Valid @RequestBody User user) throws Exception {
 		
 		log.info("Inside RegisterUser");
+		System.out.println("Inside RegisterUser ");
 		int rowcount = userdao.CreateUser(user);
 		ResponseWrapper responsewrapper = new ResponseWrapper();
 
@@ -76,5 +82,68 @@ public class maincontroller {
 			return responsewrapper;
 		}
 	}
+	@GetMapping("/fetchusers")
+	public ResponseWrapper FetchUsers()
+	{
+		ResponseWrapper responsewrapper = new ResponseWrapper();
+		List<User> UserList = new ArrayList<User>();
+		UserList = userdao.Fetchuser();
+		responsewrapper.setRet_object(UserList);
+		responsewrapper.setMsg_success("Successfully fetched");
+		return responsewrapper;
+	}
+	
+	@PostMapping("/deleteuser")
+	public ResponseWrapper Deleteuser(@RequestBody User user)
+	{
+		ResponseWrapper responsewrapper = new ResponseWrapper();
+		int rowcount;
+		if(user.getID() == null)
+		{
+			System.out.println("User id for Deletion" + user.getID());
+			responsewrapper.setMsg_failure("User Id is not specified for Deletion");
+		}
+		else
+		{
+		rowcount = userdao.Deleteuser(user);
+		responsewrapper.setRet_object(user);
+		responsewrapper.setMsg_success("Successfully Deleted");
+		}
+		return responsewrapper;
+	}
 
+	
+	@PostMapping("/modifyuser")
+	public ResponseWrapper modifyuser(@RequestBody User user)
+	{
+		ResponseWrapper responsewrapper = new ResponseWrapper();
+		System.out.println("Inside the call ModifyUser");
+		int rowcount;
+		if(user.getID() == null)
+		{
+			System.out.println("User id for Modify" + user.getFirstName());
+			System.out.println("User id for Modify" + user.getLastName());
+			System.out.println("User id for Modify" + user.getID());
+			responsewrapper.setMsg_failure("User Id is not specified for Modification");
+		}
+		else
+		{
+			System.out.println("Inside Modify User");
+		rowcount = userdao.Modifyuser(user);
+		if (rowcount==0) 
+		{
+			responsewrapper.setMsg_failure("Modification failed");
+		
+		}
+		else
+		{
+		responsewrapper.setRet_object(user);
+		responsewrapper.setMsg_success("Successfully Modified");
+		}
+		
+	}
+		return responsewrapper;
+	}
 }
+
+

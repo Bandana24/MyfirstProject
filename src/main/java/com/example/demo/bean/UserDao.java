@@ -2,7 +2,9 @@ package com.example.demo.bean;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.LogManager;
@@ -13,7 +15,6 @@ import org.springframework.jdbc.core.PreparedStatementCallback;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-import com.example.demo.controller.maincontroller;
 import com.example.demo.metadata.Sequence;
 
 @Repository
@@ -70,6 +71,31 @@ public class UserDao {
 		}
 
 	}
+	public List<User> Fetchuser()
+	{
+		System.out.println("Inside Fetchuser>>>>>>>>>>>>>>>>>Bandana");
+
+        String sql;
+        sql = "Select Id, FirstName, LastName, Email from USER" ;
+        Userrowmapper userrowmap = new Userrowmapper();
+        List<User> UserList = new ArrayList<User>();
+    	try
+		{
+    		UserList = template.query(sql,userrowmap);
+    		
+		
+		}
+		 catch (Exception e) {
+		 if (log.isDebugEnabled())
+		 {
+		       log.debug(e);
+		  }
+		
+		 }
+    	return UserList;
+		
+		
+	}
 
 	public int ExistingUser(User user)
 	{
@@ -104,7 +130,103 @@ public class UserDao {
 		 }
 		 return rowcount;
 	}
-}
+	
+	
+	public int Deleteuser(User user)
+	{
+		Map<String, Object> map= new HashMap<String, Object>();
+		
+		System.out.println("Inside function Deleteuser in UserDao Class");
+		System.out.println("User details");
+		System.out.println(user.getID());
+		
+		map.put("userid", user.getID());
+
+		String sql;
+		int rowcount=0;
+		sql = "Delete from User where ID= :userid";
+		
+		try
+		{
+		 rowcount = template.update(sql, map);
+		
+		}
+		 catch (Exception e) {
+		 if (log.isDebugEnabled())
+		 {
+		       log.debug(e);
+		  }
+		
+		 }
+		 return rowcount;
+		
+	}
+	
+	public int Modifyuser(User user)
+	{
+		Map<String, Object> map= new HashMap<String, Object>();
+		Userrowmapper userrowmap = new Userrowmapper();
+		String sql;
+		User user_return;
+		int rowcount=0;
+			
+		System.out.println("Inside function Modifyuser in UserDao Class");
+		System.out.println("User details");
+		System.out.println(user.getID());
+		
+		map.put("userid", user.getID());
+		
+		//fetch the record from the database
+		
+		sql = "Select * from USER where Id= :userid " ;
+	
+		 user_return = template.queryForObject(sql, map, userrowmap);
+		 System.out.println(user_return.getID());
+		 
+		 //Check if any of the fields in the input is null
+		
+		 if(user.getFirstName() == null)
+		 {
+			 user.setFirstName(user_return.getFirstName());
+		 }
+		 if(user.getLastName()== null)
+		 {
+			 user.setLastName(user_return.getLastName());
+		 }
+		 if(user.getEmail() == null)
+		 {
+			 user.setEmail(user_return.getEmail());
+		 }
+		 //map the inputs to be updated in the database
+		 map.put("Id", user.getID());
+		 map.put("firstname", user.getFirstName());
+		 map.put("lastname", user.getLastName());
+		 map.put("email", user.getEmail());
+		 
+		 System.out.println(user.getID());
+		 System.out.println(user.getFirstName());
+		 System.out.println(user.getLastName());
+		 System.out.println(user.getEmail());
+		 
+	    sql = "UPDATE USER set FIRSTNAME = :firstname, LASTNAME=:lastname, EMAIL=:email where ID= :Id ";
+		try
+		{
+		 rowcount = template.update(sql, map);
+		 System.out.println("ROWCOUNT" +  rowcount);
+		
+		}
+		 catch (Exception e) {
+		 if (log.isDebugEnabled())
+		 {
+		       log.debug(e);
+		  }
+		
+		 }
+		 return rowcount;
+		
+	}
+	}
+
 	
 	
 	
