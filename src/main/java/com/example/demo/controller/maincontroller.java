@@ -63,7 +63,7 @@ public class maincontroller {
 		}
 	}
 
-	@GetMapping("/validateuser")
+	@PostMapping("/validateuser")
 	public ResponseWrapper ValidateUser( @RequestBody User user) {
 		ResponseWrapper responsewrapper = new ResponseWrapper();
 		int rowcount;
@@ -71,14 +71,15 @@ public class maincontroller {
 		System.out.println(user.getFirstName());
 		System.out.println(user.getLastName());
 		System.out.println(user.getEmail());
-		rowcount = userdao.ExistingUser(user);
+		rowcount = userdao.ValidateUser(user);
+		System.out.println(rowcount);
 		if (rowcount == 1) {
 			responsewrapper.setMsg_success("LOGGED IN");
 			return responsewrapper;
 		}
 		else 
 		{
-			responsewrapper.setMsg_failure("Please Register");
+			responsewrapper.setMsg_failure("Please Sign Up");
 			return responsewrapper;
 		}
 	}
@@ -88,8 +89,31 @@ public class maincontroller {
 		ResponseWrapper responsewrapper = new ResponseWrapper();
 		List<User> UserList = new ArrayList<User>();
 		UserList = userdao.Fetchuser();
+	
 		responsewrapper.setRet_object(UserList);
 		responsewrapper.setMsg_success("Successfully fetched");
+		return responsewrapper;
+	}
+	
+	@PostMapping("/searchusers")
+	public ResponseWrapper SearchUsers(@RequestBody User user)
+	{
+		ResponseWrapper responsewrapper = new ResponseWrapper();
+		List<User> UserList = new ArrayList<User>();
+		UserList = userdao.SearchUsers(user);
+		 System.out.println("After the search function"); 
+		Boolean Userlistflag = UserList.isEmpty(); 
+        if (Userlistflag == true) 
+        {
+            System.out.println("The List is empty"); 
+        }
+        else
+        {
+            System.out.println("The List is not empty"); 
+        }
+		responsewrapper.setRet_object(UserList);
+		responsewrapper.setMsg_success("Successfully fetched");
+		 System.out.println(UserList); 
 		return responsewrapper;
 	}
 	

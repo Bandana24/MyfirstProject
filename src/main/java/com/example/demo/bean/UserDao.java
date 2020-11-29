@@ -96,6 +96,112 @@ public class UserDao {
 		
 		
 	}
+	
+	public List<User> SearchUsers(User user)
+	{
+	
+		Map<String,Object> map = new HashMap<String,Object>();
+		 Userrowmapper userrowmap = new Userrowmapper();
+		  List<User> UserList = new ArrayList<User>();
+		
+		System.out.println("Inside function SearchUsers in UserDao Class");
+		System.out.println("User details");
+		System.out.println(user.getID());
+		System.out.println(user.getFirstName());
+		System.out.println(user.getLastName());
+		System.out.println(user.getEmail());
+		
+
+		map.put("id", user.getID());
+		map.put("firstname", user.getFirstName());
+		map.put("lastname", user.getLastName());
+		map.put("email", user.getEmail());
+		String mainsql,sql;
+		mainsql= null;
+		int flag=0;
+		sql="SELECT * FROM USER ";
+		 
+		if(user.getID() != null)
+		{
+			if(flag == 0)
+			{
+				mainsql= sql.concat(" where ID=:id  ");
+				sql=mainsql;
+				flag=1;
+			}
+		}
+		if(user.getFirstName() != null)
+		{
+			if(flag == 0)
+			{
+				mainsql = sql.concat(" where FIRSTNAME=:firstname");
+				sql=mainsql;
+				flag=1;
+			}
+			else
+			{
+				mainsql =sql.concat(" and FIRSTNAME=:firstname");
+				sql=mainsql;
+				flag=1;
+			}
+			
+		}
+		if(user.getLastName() != null)
+		{
+			if(flag == 0)
+			{
+				mainsql = sql.concat(" where LastName=:lastname");
+				sql=mainsql;
+				flag=1;
+			}
+			else
+			{
+				mainsql =sql.concat("  and LastName=:lastname");
+				sql=mainsql;
+			}
+			
+		}
+		if(user.getEmail() != null)
+		{
+			if(flag == 0)
+			{
+				mainsql = sql.concat(" where Email=:email");
+				sql=mainsql;
+				flag=1;
+			}
+			else
+			{
+				mainsql =sql.concat("  and  Email=:email");
+				sql=mainsql;
+			}
+			
+		}
+		if(mainsql== null)
+		{
+			mainsql=sql;
+		}
+		
+	
+		System.out.println(mainsql);
+	
+
+		//sql= "SELECT * FROM USER WHERE FIRSTNAME=:firstname and LASTNAME= :lastname and EMAIL =:email AND ID= :Id";
+		
+		try
+		{
+			UserList = template.query(mainsql,map,userrowmap);
+		
+		}
+		 catch (Exception e) {
+		 if (log.isDebugEnabled())
+		 {
+		       log.debug(e);
+		  }
+		
+		 }
+		 return UserList;
+	}
+	
 
 	public int ExistingUser(User user)
 	{
@@ -116,6 +222,41 @@ public class UserDao {
 		String sql;
 		int rowcount=0;
 		sql= "SELECT count(*) FROM USER WHERE FIRSTNAME=:firstname and LASTNAME= :lastname and EMAIL =:email ";
+		try
+		{
+		 rowcount = template.queryForObject(sql, map, Integer.class);
+		
+		}
+		 catch (Exception e) {
+		 if (log.isDebugEnabled())
+		 {
+		       log.debug(e);
+		  }
+		
+		 }
+		 return rowcount;
+	}
+	
+	
+	public int ValidateUser(User user)
+	{
+	
+		Map<String,Object> map = new HashMap<String,Object>();
+		
+		System.out.println("Inside function ExistingUser in UserDao Class");
+		System.out.println("User details");
+		
+		System.out.println(user.getEmail());
+		System.out.println(user.getPassword());
+		
+		
+		
+		map.put("email", user.getEmail());
+		map.put("password",user.getPassword());
+		
+		String sql;
+		int rowcount=0;
+		sql= "SELECT count(*) FROM USER WHERE  EMAIL =:email and Password=:password ";
 		try
 		{
 		 rowcount = template.queryForObject(sql, map, Integer.class);
